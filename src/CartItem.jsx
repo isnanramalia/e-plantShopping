@@ -3,112 +3,75 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
-
-// addItem: (state, action) => {
-//   const { name, image, cost } = action.payload;
-//   const existingItem = state.items.find(item => item.name === name);
-//   if (existingItem) {
-//     existingItem.quantity++;
-//   } else {
-//     state.items.push({ name, image, cost, quantity: 1 });
-//   }
-// },
-// state.items = state.items.filter(item => item.name !== action.payload);
-
-// const { name, quantity } = action.payload;
-// const itemToUpdate = state.items.find(item => item.name === name);
-// if (itemToUpdate) {
-//   itemToUpdate.quantity = quantity;
-// }
-
-
-const CartItem = ({ onContinueShopping }) => {
-  const cart = useSelector((state) => state.cart.items);
+const CartItem = ({ onRemoveItem, onContinueShopping }) => {
+  const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
-  // Menghitung total biaya untuk semua produk di keranjang
+  // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
-    return cart.reduce((total, item) => total + calculateTotalCost(item), 0);
+    return cart.reduce((total, item) => {
+        return total + item.quantity * parseFloat(item.cost.substring(1));
+    }, 0);
   };
 
-  // Menangani aksi "Lanjutkan Belanja"
   const handleContinueShopping = (e) => {
-    e.preventDefault();
-    onContinueShopping();
+    onContinueShopping(e);
   };
 
-  // Menangani penambahan jumlah item
+  const handleCheckoutShopping = (e) => {
+    alert('Functionality to be added for future reference');
+  };
+
   const handleIncrement = (item) => {
-    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+    dispatch(updateQuantity({name: item.name, quantity: item.quantity + 1}));
   };
 
-  // Menangani pengurangan jumlah item
   const handleDecrement = (item) => {
-    if (item.quantity > 1) {
-      dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
+    let newQuantity = item.quantity - 1;
+    if(newQuantity == 0){
+        dispatch(removeItem(item.name));
+        onRemoveItem(item);
     } else {
-      handleRemove(item);
+        dispatch(updateQuantity({name: item.name, quantity: newQuantity}));
     }
   };
 
-  // Menghapus item dari keranjang
   const handleRemove = (item) => {
-    dispatch(removeItem(item.id));
+    dispatch(removeItem(item.name));
+    onRemoveItem(item);
   };
 
-  // Menghitung total biaya berdasarkan jumlah untuk setiap item
+  // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
-    return item.quantity * item.cost;
+    return item.quantity * parseFloat(item.cost.substring(1));
   };
 
   return (
     <div className="cart-container">
-      <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount().toFixed(2)}</h2>
+      <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
       <div>
-        {cart.map((item) => (
-          <div className="cart-item" key={item.id}>
+        {cart.map(item => (
+          <div className="cart-item" key={item.name}>
             <img className="cart-item-image" src={item.image} alt={item.name} />
             <div className="cart-item-details">
               <div className="cart-item-name">{item.name}</div>
-              <div className="cart-item-cost">${item.cost.toFixed(2)}</div>
+              <div className="cart-item-cost">{item.cost}</div>
               <div className="cart-item-quantity">
-                <button
-                  className="cart-item-button cart-item-button-dec"
-                  onClick={() => handleDecrement(item)}
-                >
-                  -
-                </button>
+                <button className="cart-item-button cart-item-button-dec" onClick={() => handleDecrement(item)}>-</button>
                 <span className="cart-item-quantity-value">{item.quantity}</span>
-                <button
-                  className="cart-item-button cart-item-button-inc"
-                  onClick={() => handleIncrement(item)}
-                >
-                  +
-                </button>
+                <button className="cart-item-button cart-item-button-inc" onClick={() => handleIncrement(item)}>+</button>
               </div>
-              <div className="cart-item-total">
-                Total: ${calculateTotalCost(item).toFixed(2)}
-              </div>
-              <button
-                className="cart-item-delete"
-                onClick={() => handleRemove(item)}
-              >
-                Delete
-              </button>
+              <div className="cart-item-total">Total: ${calculateTotalCost(item)}</div>
+              <button className="cart-item-delete" onClick={() => handleRemove(item)}>Delete</button>
             </div>
           </div>
         ))}
       </div>
-      <div style={{ marginTop: '20px', color: 'black' }} className="total_cart_amount"></div>
+      <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'></div>
       <div className="continue_shopping_btn">
-        <button
-          className="get-started-button"
-          onClick={(e) => handleContinueShopping(e)}
-        >
-          Continue Shopping
-        </button>
+        <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
         <br />
-        <button className="get-started-button1">Checkout</button>
+        <button className="get-started-button1" onClick={(e)=>handleCheckoutShopping(e)}>Checkout</button>
       </div>
     </div>
   );
