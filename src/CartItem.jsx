@@ -3,6 +3,25 @@ import { useSelector, useDispatch } from 'react-redux';
 import { removeItem, updateQuantity } from './CartSlice';
 import './CartItem.css';
 
+
+// addItem: (state, action) => {
+//   const { name, image, cost } = action.payload;
+//   const existingItem = state.items.find(item => item.name === name);
+//   if (existingItem) {
+//     existingItem.quantity++;
+//   } else {
+//     state.items.push({ name, image, cost, quantity: 1 });
+//   }
+// },
+// state.items = state.items.filter(item => item.name !== action.payload);
+
+// const { name, quantity } = action.payload;
+// const itemToUpdate = state.items.find(item => item.name === name);
+// if (itemToUpdate) {
+//   itemToUpdate.quantity = quantity;
+// }
+
+
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
